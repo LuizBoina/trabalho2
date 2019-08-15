@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "arvore.h"
-#define NUM 0
-#define CAR 1
+#include "bitmap.h"
+#include "compactador.h"
 
 struct arvore {
     Arv* dir;
@@ -22,13 +22,13 @@ int arv_vazia(Arv* a) {
     return a == NULL;
 }
 
-Arv* libera_arv(Arv* a) {
+void libera_arv(Arv* a) {
     if (!arv_vazia(a)) {
         libera_arv(a->dir);
         libera_arv(a->esq);
         free(a);
     }
-    return NULL;
+    return;
 }
 
 Arv* cria_arv(int num, Arv* dir, Arv* esq) {
@@ -39,8 +39,6 @@ Arv* cria_arv(int num, Arv* dir, Arv* esq) {
     return nova;
 }
 
-//a frequencia do caracter entra no ramo da direita
-
 Arv* cria_caracter(unsigned char c, Arv* dir, Arv* esq) {
     Arv* novo = (Arv*) malloc(sizeof (Arv));
     novo->dir = dir;
@@ -49,6 +47,34 @@ Arv* cria_caracter(unsigned char c, Arv* dir, Arv* esq) {
     return novo;
 }
 
-int arv_freq(Arv* a){
+int arv_freq(Arv* a) {
     return a->freq;
+}
+
+int eh_no_de_folha(Arv* arv) {
+    return (arv->dir->dir == NULL && arv->dir->esq == NULL);
+}
+
+unsigned char retorna_caracter(Arv* arv) {
+    return arv->dir->caracter;
+}
+
+Arv* retorna_arv_esq(Arv* arv) {
+    return arv->esq;
+}
+
+Arv* retorna_arv_dir(Arv* arv) {
+    return arv->dir;
+}
+
+static int max2(int a, int b) {
+    return (a > b) ? a : b;
+}
+
+int arv_altura(Arv* a) {
+    if (arv_vazia(a))
+        return -1;
+    else
+        return 1 + max2(arv_altura(a->esq),
+            arv_altura(a->dir));
 }
